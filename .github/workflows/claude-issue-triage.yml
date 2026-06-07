@@ -1,0 +1,96 @@
+name: Claude Issue Triage
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Analizar issue con Claude
+        id: claude-triage
+        uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ github.token }}
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          claude_args: >-
+            --allowed-tools
+            "Bash(gh label list*),Bash(gh label create*),Bash(gh issue edit*),Bash(gh issue comment*),Bash(gh issue view*),Read,Glob,Grep"
+          prompt: |
+            Eres un asistente de triaje para el repositorio de un juego de Tetris en JavaScript (sin dependencias).
+            El repositorio contiene exactamente tres archivos relevantes:
+            - `game.js`  — toda la lógica del juego (~300 líneas, 'use strict')
+            - `index.html` — estructura DOM: canvas 300×600 px, panel lateral, overlay de pausa/game over
+            - `style.css`  — tema oscuro retro arcade
+
+            Se acaba de ${{ github.event.action == 'opened' && 'abrir' || 'editar' }} el issue #${{ github.event.issue.number }}.
+
+            **Título:** ${{ github.event.issue.title }}
+
+            **Cuerpo:**
+            ${{ github.event.issue.body }}
+
+            Realiza los siguientes pasos en orden:
+
+            ## 1. Consultar labels existentes
+            Ejecuta `gh label list --repo ${{ github.repository }} --limit 100` para ver las labels disponibles.
+
+            ## 2. Determinar labels apropiadas
+            Basándote en el título y cuerpo del issue, elige las labels más adecuadas de entre:
+            - `bug` — algo no funciona correctamente
+            - `enhancement` — mejora o nueva funcionalidad
+            - `ui` — cambios visuales, CSS, canvas, overlay
+            - `gameplay` — mecánicas del juego: colisión, rotación, gravedad, líneas, puntuación
+            - `question` — duda o consulta sin problema claro
+            - `needs-info` — el issue es ambiguo y necesita más detalles
+            - `good first issue` — tarea accesible para alguien que empieza
+            - `priority: high` — afecta la jugabilidad de forma crítica
+            - `priority: low` — cosmético o menor
+
+            Si alguna label necesaria no existe en el repo, créala con:
+            `gh label create "nombre" --repo ${{ github.repository }} --color "HEXCOLOR" --description "descripción breve"`
+            Usa colores apropiados (ej. bug → #d73a4a, enhancement → #a2eeef, ui → #7057ff, gameplay → #0075ca).
+
+            Aplica las labels elegidas con:
+            `gh issue edit ${{ github.event.issue.number }} --repo ${{ github.repository }} --add-label "label1,label2"`
+
+            ## 3. Publicar diagnóstico
+            Publica un comentario en español usando:
+            `gh issue comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body "..."`
+
+            El comentario debe tener exactamente esta estructura en Markdown:
+
+            ---
+            🤖 **Diagnóstico automático de Claude**
+
+            ### 📋 Resumen del problema
+            [Una o dos oraciones describiendo el problema reportado.]
+
+            ### 🔍 Causa probable
+            [Explica la causa técnica más probable basándote en cómo funciona el juego:
+            - Menciona funciones clave de `game.js` que podrían estar implicadas (ej. `collide()`, `tryRotate()`, `clearLines()`, `loop()`, `ghostY()`).
+            - Indica si afecta `index.html` o `style.css`.]
+
+            ### 📁 Archivos implicados
+            [Lista los archivos y, si es posible, las funciones/secciones concretas a revisar.]
+
+            ### 🛠️ Enfoque sugerido para la solución
+            [Describe en 2-4 puntos concretos cómo abordar la solución, sin escribir el código.]
+
+            ### 🏷️ Labels asignadas
+            [Lista las labels que se aplicaron al issue.]
+            ---
+
+            Importante: sé conciso, técnico y en español. No inventes comportamientos del código; basa el diagnóstico en la arquitectura conocida del repo.
