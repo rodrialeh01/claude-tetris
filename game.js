@@ -453,6 +453,10 @@ document.addEventListener('keydown', e => {
   updateHUD();
 });
 
+<<<<<<< HEAD
 // ---- Theme ----
+=======
+restartBtn.addEventListener('click', init);
+>>>>>>> parent of a425c0b (Merge pull request #7 from rodrialeh01/claude/issue-5-20260607-2333)
 
 init();
