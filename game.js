@@ -113,12 +113,14 @@ function clearLines() {
 }
 
 function ghostY() {
+  if (!current) return 0;
   let gy = current.y;
   while (!collide(current.shape, current.x, gy + 1)) gy++;
   return gy;
 }
 
 function hardDrop() {
+  if (!current) return;
   const gy = ghostY();
   score += (gy - current.y) * 2;
   current.y = gy;
@@ -252,6 +254,7 @@ function loop(ts) {
       lockPiece();
     }
   }
+  if (gameOver) return;
   draw();
   animId = requestAnimationFrame(loop);
 }
