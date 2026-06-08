@@ -169,7 +169,7 @@ function drawBlock(context, x, y, colorIndex, size, alpha) {
 }
 
 function drawGrid() {
-  ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--grid-color').trim();
+  ctx.strokeStyle = '#22222e';
   ctx.lineWidth = 0.5;
   for (let c = 1; c < COLS; c++) {
     ctx.beginPath();
@@ -300,22 +300,5 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
-
-const themeToggle = document.getElementById('theme-toggle');
-
-if (localStorage.getItem('theme') === 'light') {
-  document.body.classList.add('light-mode');
-  themeToggle.checked = true;
-}
-
-themeToggle.addEventListener('change', () => {
-  if (themeToggle.checked) {
-    document.body.classList.add('light-mode');
-    localStorage.setItem('theme', 'light');
-  } else {
-    document.body.classList.remove('light-mode');
-    localStorage.setItem('theme', 'dark');
-  }
-});
 
 init();
