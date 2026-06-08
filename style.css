@@ -258,3 +258,56 @@ kbd {
 .switch input:checked + .slider::before {
   transform: translateX(18px);
 }
+
+/* ---- Skin selector ---- */
+.skin-select {
+  background: var(--kbd-bg);
+  color: var(--text);
+  border: 1px solid var(--kbd-border);
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.skin-select:focus {
+  outline: 1px solid var(--accent);
+}
+
+/* ---- Skin: Neon ---- */
+body.skin-neon {
+  --board-bg: #000008;
+  --board-border: #003344;
+  --grid-color: #0a0a1a;
+  --bg: #05050f;
+  --title-shadow: rgba(0, 255, 245, 0.5);
+  --accent: #00fff5;
+  --accent-hover: #66fffa;
+}
+
+/* ---- Skin: Pastel ---- */
+body.skin-pastel {
+  --board-bg: #f7f0ff;
+  --board-border: #d9c8f0;
+  --grid-color: #ede0f8;
+  --bg: #f0e8ff;
+  --title-shadow: rgba(180, 140, 230, 0.4);
+  --accent: #b48ce6;
+  --accent-hover: #c9a8f0;
+  --label-color: #b09abf;
+}
+
+/* ---- Skin: Pixel art ---- */
+body.skin-pixel {
+  --board-bg: #0d1117;
+  --board-border: #2a3040;
+  --grid-color: #161b24;
+  --bg: #0a0e15;
+  --title-shadow: rgba(80, 200, 80, 0.4);
+  --accent: #50c850;
+  --accent-hover: #70e870;
+  --label-color: #3a5a3a;
+}
